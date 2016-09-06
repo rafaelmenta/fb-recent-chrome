@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+
+  "name": "FB Recent",
+  "description": "Force facebook home URL to load newsfeed always on most recent sorting.",
+  "version": "0.0.1",
+
+  "background" : {
+    "scripts" : ["recentify/constants.js", "index.js"]
+  },
+
+  "browser_action": {
+    "default_icon" : "data/icon-64-on.png",
+    "default_title" : "FB Recent is ON"
+  },
+
+  "author" : "Rafael Guedes",
+
+  "content_scripts": [{
+    "matches": ["*://*.facebook.com/*"],
+    "js": ["data/recentify.js"]
+  }],
+
+  "permissions": [
+    "activeTab"  ]
+}
