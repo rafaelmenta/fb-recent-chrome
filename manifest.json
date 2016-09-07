@@ -9,8 +9,12 @@
     "scripts" : ["recentify/constants.js", "recentify/core.js", "index.js"]
   },
 
+  "icons": {
+    "16":  "data/icon-16-on.png",
+    "48":  "data/icon-48-on.png",
+    "128": "data/icon-128-on.png" },
+
   "browser_action": {
-    "default_icon" : "data/icon-64-on.png",
     "default_title" : "FB Recent is ON"
   },
 
@@ -23,6 +27,7 @@
 
   "permissions": [
     "activeTab",
-    "tabs"
+    "tabs",
+    "storage"
   ]
 }

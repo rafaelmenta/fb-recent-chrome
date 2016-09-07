@@ -1,29 +1,45 @@
-let state = STATES.ON;
+chrome.storage.sync.get({
+  'buttonState' : STATES.ON
+}, (options) => {
+  state = options.buttonState;
+  changeIcon();
+  changeTitle();
+  toggleFeature();
+
+});
+
+let toggleFeature = function() {
+  if (state === STATES.ON) {
+    on();
+  } else {
+    off();
+  }
+};
 
 let toggleState = function() {
   state = state === STATES.ON ? STATES.OFF : STATES.ON;
-  console.log('state changed to ', state);
+  chrome.storage.sync.set({
+    buttonState : state
+  });
 }
 
-let toggleButton = function(tab) {
-  toggleState();
-
-  chrome.tabs.getSelected(null, function(tab) {
-    let tabId = tab.id;
-
-    chrome.browserAction.setIcon({
-      tabId : tabId,
-      path : ICONS[state]['64']
-    });
-
-    chrome.browserAction.setTitle({
-      tabId : tabId,
-      title : 'FB Recent is ' + state
-    });
-
-
-
+let changeIcon = function() {
+  chrome.browserAction.setIcon({
+    path : ICONS[state]['128']
   });
+};
+
+let changeTitle = function() {
+  chrome.browserAction.setTitle({
+    title : 'FB Recent is ' + state
+  });
+}
+
+let toggleButton = function() {
+  toggleState();
+  changeIcon();
+  changeTitle();
+  toggleFeature();
 };
 
 let recentifyUrls = function(urls) {
@@ -35,14 +51,14 @@ let recentifyUrls = function(urls) {
   return urls;
 };
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+let f1 = function(request, sender, sendResponse) {
   if (request.message === 'recentify.urls') {
     let urls = recentifyUrls(request.urls);
     sendResponse({urls: urls});
   }
-});
+};
 
-chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
+let f2 = function (tabId, changeInfo, tab) {
   if (changeInfo.status === 'complete' && tab.active) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       let urls;
@@ -56,9 +72,9 @@ chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
       }
     });
   }
-});
+};
 
-chrome.tabs.onUpdated.addListener(function(tabId, info, tab) {
+let f3 = function(tabId, info, tab) {
   if (info.status === 'loading') {
     let url = new URL(tab.url);
 
@@ -69,7 +85,25 @@ chrome.tabs.onUpdated.addListener(function(tabId, info, tab) {
       chrome.tabs.update(tab.id, {url: url.href});
     }
   }
-});
+};
+
+let on = function() {
+  chrome.runtime.onMessage.addListener(f1);
+  chrome.tabs.onUpdated.addListener(f2);
+  chrome.tabs.onUpdated.addListener(f3);
+
+  chrome.browserAction.setBadgeText({
+    text : ''
+  });
+};
+
+let off = function() {
+  chrome.runtime.onMessage.removeListener(f1);
+  chrome.tabs.onUpdated.removeListener(f2);
+  chrome.tabs.onUpdated.removeListener(f3);
+  chrome.browserAction.setBadgeText({
+    text : 'off'
+  });
+};
 
 chrome.browserAction.onClicked.addListener(toggleButton);
-

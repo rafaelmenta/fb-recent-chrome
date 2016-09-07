@@ -1,9 +1,13 @@
 const ICONS = {
   ON : {
-    '64': 'data/icon-64-on.png'
+    '16': 'data/icon-48-on.png',
+    '48': 'data/icon-48-on.png',
+    '128': 'data/icon-48-on.png'
   },
   OFF : {
-    '64': 'data/icon-64-off.png'
+    '16': 'data/icon-48-off.png',
+    '48': 'data/icon-48-off.png',
+    '128': 'data/icon-48-off.png'
   }
 };
 
